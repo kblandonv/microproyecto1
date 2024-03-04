@@ -27,7 +27,7 @@ NumMFs=4
 MF1='Frio':'trimf',[0 0 10]
 MF2='Fresco':'trimf',[5 13 20]
 MF3='Templado':'trimf',[15 25 30]
-MF4='Calido':'trimf',[25 33 35]
+MF4='Calido':'trimf',[25 33 40]
 
 [Input3]
 Name='Indice_de_Nutrientes_del_Suelo'
