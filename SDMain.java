@@ -1,8 +1,14 @@
-package SD;
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
+ */
+package inferencia;
 
-import tipper_fis.FIS_Controlador;
-
+import java.util.ArrayList;
 import java.util.Scanner;
+import net.sourceforge.jFuzzyLogic.FIS;
+import net.sourceforge.jFuzzyLogic.plot.JFuzzyChart;
+import net.sourceforge.jFuzzyLogic.rule.Variable;
 
 public class SDMain {
 
@@ -16,16 +22,16 @@ public class SDMain {
     }
 
 
-    public double[] evaluar(double Humedad_del_suelo, double Temperatura, double Indice_de_Nutrientes_del_Suelo) {
+    public String[] evaluar(double Humedad_del_suelo, double Temperatura, double Indice_de_Nutrientes_del_Suelo) {
 
         // Carga el archivo de lenguaje de control difuso 'FCL'
-        String fileName = "src/SD/FIS.fcl";
+        String fileName = "src/inferencia/FIS.fcl";
         FIS fis = FIS.load(fileName, true);
 
         // En caso de error
         if (fis == null) {
             System.err.println("No se puede cargar el archivo: '" + fileName + "'");
-            return "";
+            return new String[0];
         }
 
         // Establecer las entradas del sistema
@@ -42,10 +48,10 @@ public class SDMain {
 
         // Muestra el conjunto difuso sobre el que se calcula el COG
         Variable tip1 = fis.getVariable("Cantidad_de_Agua_de_Riego");
-        JFuzzyChart.get().chart(tip, tip1.getDefuzzifier(), true);
+        JFuzzyChart.get().chart(tip1, tip1.getDefuzzifier(), true);
 
         Variable tip2 = fis.getVariable("Tiempo_de_Riego");
-        JFuzzyChart.get().chart(tip, tip2.getDefuzzifier(), true);
+        JFuzzyChart.get().chart(tip2, tip2.getDefuzzifier(), true);
 
 
         // Imprime el valor concreto de salida del sistema
@@ -54,7 +60,7 @@ public class SDMain {
 
         // Muestra cuanto peso tiene la variable de salida en cada CD de salida
         double pertenenciamuyBaja = fis.getVariable("Cantidad_de_Agua_de_Riego").getMembership("Muy_baja");
-        double pertenenciaBaja = fis.getVariable("Cantidad_de_Agua_de_Riego").getMembership("baja");
+        double pertenenciaBaja = fis.getVariable("Cantidad_de_Agua_de_Riego").getMembership("Baja");
         double pertenenciaMedia = fis.getVariable("Cantidad_de_Agua_de_Riego").getMembership("Media");
         double pertenenciaAlta = fis.getVariable("Cantidad_de_Agua_de_Riego").getMembership("Alta");
 
@@ -66,19 +72,19 @@ public class SDMain {
         String recomendacion1 = "";
         String recomendacion2 = "";
 
-        if (pertenenciamuyBaja <= pertenenciaBaja &&
-                pertenenciamuyBaja <= pertenenciaMedia &&
-                pertenenciamuyBaja <= pertenenciaAlta) {
+        if (pertenenciamuyBaja >= pertenenciaBaja &&
+                pertenenciamuyBaja >= pertenenciaMedia &&
+                pertenenciamuyBaja >= pertenenciaAlta) {
             recomendacion1 = "Muy_baja";
         }
         else if (pertenenciaBaja >= pertenenciamuyBaja &&
-                pertenenciaBaja <= pertenenciaMedia &&
-                pertenenciaBaja <= pertenenciaAlta) {
-            recomendacion1 = "baja";
+                pertenenciaBaja >= pertenenciaMedia &&
+                pertenenciaBaja >= pertenenciaAlta) {
+            recomendacion1 = "Baja";
         }
         else if (pertenenciaMedia >= pertenenciamuyBaja &&
                 pertenenciaMedia >= pertenenciaBaja &&
-                pertenenciaMedia <= pertenenciaAlta) {
+                pertenenciaMedia >= pertenenciaAlta) {
             recomendacion1 = "Media";
         }
         else if (pertenenciaAlta >= pertenenciamuyBaja &&
@@ -89,94 +95,30 @@ public class SDMain {
 
 
 
-        if (pertenenciaCorto <= pertenenciaModerado &&
-                pertenenciaCorto <= pertenenciaLargo &&
-                pertenenciaCorto <= pertenenciaMuy_largo) {
+        if (pertenenciaCorto >= pertenenciaModerado &&
+                pertenenciaCorto >= pertenenciaLargo &&
+                pertenenciaCorto >= pertenenciaMuy_largo) {
             recomendacion2 = "Corto";
         } else if (pertenenciaModerado >= pertenenciaCorto &&
-                pertenenciaModerado <= pertenenciaLargo &&
-                pertenenciaModerado <= pertenenciaMuy_largo) {
+                pertenenciaModerado >= pertenenciaLargo &&
+                pertenenciaModerado >= pertenenciaMuy_largo) {
             recomendacion2 = "Moderado";
         } else if (pertenenciaLargo >= pertenenciaCorto &&
                 pertenenciaLargo >= pertenenciaModerado &&
-                pertenenciaLargo <= pertenenciaMuy_largo) {
+                pertenenciaLargo >= pertenenciaMuy_largo) {
             recomendacion2 = "Largo";
         } else if (pertenenciaMuy_largo >= pertenenciaCorto &&
                 pertenenciaMuy_largo >= pertenenciaModerado &&
                 pertenenciaMuy_largo >= pertenenciaLargo) {
             recomendacion2 = "Muy_largo";
         }
-
-
-
-
-        return ("Cantida de agua de riego: " + String.format("%.1d", salida1) + "litros por día" +
-                "Tiempo de riego: " + String.format("%.1d", salida2) + "minutos por día" +
-                "\n\n" + "Se recomienda utilizar una cantidad de agua de riego " + recomendacion1 +
-                "\n\n" + "Se recomienda realizar el riego por un tiempo " + recomendacion2 +
-                "\n\n" );
+        
+        String[] resultados = new String[2];
+        
+        resultados[0] = "Cantidad de agua de riego: " + String.format("%.1f", salida1) + " litros por día. Se recomienda utilizar una cantidad de agua de riego " + recomendacion1;
+        resultados[1] = "Tiempo de riego: " + String.format("%.1f", salida2) + " minutos por día. Se recomienda realizar el riego por un tiempo " + recomendacion2;
+        System.out.println("ll" + recomendacion1);
+        System.out.println("33" + recomendacion2);
+        return resultados;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
