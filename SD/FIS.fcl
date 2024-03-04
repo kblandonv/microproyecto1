@@ -1,0 +1,74 @@
+FUNCTION_BLOCK SistemaDifuso
+VAR_INPUT
+    Humedad_del_suelo : REAL; RANGE := (0 .. 100);
+    Temperatura : REAL;RANGE := (0 .. 40) ;
+    Indice_de_Nutrientes_del_Suelo : REAL;RANGE := (0 .. 10);
+END_VAR
+
+VAR_OUTPUT
+    Cantidad_de_Agua_de_Riego : REAL; RANGE := (0 .. 10);
+    Tiempo_de_Riego : REAL; RANGE := (0 .. 60);
+END_VAR
+
+FUZZIFY Humedad_del_suelo
+    TERM Muy_seco := trian 0 0 30 ;
+    TERM Seco := trian 20 35 50.2;
+    TERM Muy_Humedo := trian 70 70 100 ;
+    TERM Humedo := trian 40 58 80 ;
+END_FUZZIFY
+
+FUZZIFY Temperatura
+    TERM Frio := trian 0 0 10 ;
+    TERM Fresco := trian 5 13 20 ;
+    TERM Templado := trian 15 25 30;
+    TERM Calido := trian 25 33 35 ;
+END_FUZZIFY
+
+FUZZIFY Indice_de_Nutrientes_del_Suelo
+    TERM Pobre := trian 0 0 3 ;
+    TERM Regular := trian 2 5 6 ;
+    TERM Bueno := trian 5 7 9 ;
+    TERM Excelente := trian 7 8.319 10 ;
+END_FUZZIFY
+
+DEFUZZIFY Cantidad_de_Agua_de_Riego
+    TERM Muy_baja := trian 0 0 2;
+    TERM Baja := trian 1 2 4;
+    TERM Media := trian 3 3 7;
+    TERM Alta := trian 5 5 10;
+    METHOD : COG;
+    DEFAULT := 0;
+END_DEFUZZIFY
+
+DEFUZZIFY Tiempo_de_Riego
+    TERM Corto := trian 0 0 15;
+    TERM Moderado := trian 10 20 30;
+    TERM Largo := trian 25 37 45;
+    TERM Muy_largo := trian 40 48 60;
+    METHOD : COG;
+    DEFAULT := 0;
+END_DEFUZZIFY
+
+RULEBLOCK No1
+    AND : MIN;
+    ACT : MIN;
+    ACCU : MAX;
+
+    RULE 1 : IF (Humedad_del_suelo IS Seco) AND (Temperatura IS Frio) AND (Indice_de_Nutrientes_del_Suelo IS Regular) THEN Cantidad_de_Agua_de_Riego IS Media , Tiempo_de_Riego IS Moderado;
+    RULE 2 : IF (Humedad_del_suelo IS Seco) AND (Temperatura IS Templado) AND (Indice_de_Nutrientes_del_Suelo IS Excelente) THEN Cantidad_de_Agua_de_Riego IS Alta , Tiempo_de_Riego IS Moderado;
+    RULE 3 : IF (Humedad_del_suelo IS Humedo) AND (Temperatura IS Calido) AND (Indice_de_Nutrientes_del_Suelo IS Regular) THEN Cantidad_de_Agua_de_Riego IS Alta , Tiempo_de_Riego IS Largo;
+    RULE 4 : IF (Humedad_del_suelo IS Humedo) AND (Temperatura IS Fresco) AND (Indice_de_Nutrientes_del_Suelo IS Pobre) THEN Cantidad_de_Agua_de_Riego IS Media , Tiempo_de_Riego IS Corto;
+    RULE 5 : IF (Humedad_del_suelo IS Muy_seco) AND (Temperatura IS Calido) AND (Indice_de_Nutrientes_del_Suelo IS Pobre) THEN Cantidad_de_Agua_de_Riego IS Alta , Tiempo_de_Riego IS Muy_largo;
+    RULE 6 : IF (Humedad_del_suelo IS Seco) AND (Temperatura IS Frio) AND (Indice_de_Nutrientes_del_Suelo IS Bueno) THEN Cantidad_de_Agua_de_Riego IS Media , Tiempo_de_Riego IS Moderado;
+    RULE 7 : IF (Humedad_del_suelo IS Humedo) AND (Temperatura IS Templado) AND (Indice_de_Nutrientes_del_Suelo IS Regular) THEN Cantidad_de_Agua_de_Riego IS Baja , Tiempo_de_Riego IS Moderado;
+    RULE 8 : IF (Humedad_del_suelo IS Muy_Humedo) AND (Temperatura IS Calido) AND (Indice_de_Nutrientes_del_Suelo IS Bueno) THEN Cantidad_de_Agua_de_Riego IS Baja , Tiempo_de_Riego IS Moderado;
+    RULE 9 : IF (Humedad_del_suelo IS Seco) AND (Temperatura IS Templado) AND (Indice_de_Nutrientes_del_Suelo IS Pobre) THEN Cantidad_de_Agua_de_Riego IS Media , Tiempo_de_Riego IS Largo;
+    RULE 10 : IF (Humedad_del_suelo IS Muy_seco) AND (Temperatura IS Frio) AND (Indice_de_Nutrientes_del_Suelo IS Pobre) THEN Cantidad_de_Agua_de_Riego IS Baja , Tiempo_de_Riego IS Largo;
+    RULE 11 : IF (Humedad_del_suelo IS Muy_seco) AND (Temperatura IS Fresco) AND (Indice_de_Nutrientes_del_Suelo IS Bueno) THEN Cantidad_de_Agua_de_Riego IS Media , Tiempo_de_Riego IS Largo;
+    RULE 12 : IF (Humedad_del_suelo IS Humedo) AND (Temperatura IS Calido) AND (Indice_de_Nutrientes_del_Suelo IS Excelente) THEN Cantidad_de_Agua_de_Riego IS Baja , Tiempo_de_Riego IS Moderado;
+    RULE 13 : IF (Humedad_del_suelo IS Muy_Humedo) AND (Temperatura IS Templado) AND (Indice_de_Nutrientes_del_Suelo IS Excelente) THEN Cantidad_de_Agua_de_Riego IS Muy_baja , Tiempo_de_Riego IS Corto;
+    RULE 14 : IF (Humedad_del_suelo IS Humedo) AND (Temperatura IS Frio) AND (Indice_de_Nutrientes_del_Suelo IS Regular) THEN Cantidad_de_Agua_de_Riego IS Baja , Tiempo_de_Riego IS Moderado;
+    RULE 15 : IF (Humedad_del_suelo IS Seco) AND (Temperatura IS Frio) AND (Indice_de_Nutrientes_del_Suelo IS Pobre) THEN Cantidad_de_Agua_de_Riego IS Alta , Tiempo_de_Riego IS Moderado;
+
+END_RULEBLOCK
+END_FUNCTION_BLOCK
